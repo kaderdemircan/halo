@@ -70,6 +70,7 @@ transformed_df["age_group"] = transformed_df["age"].apply(categorize_age)
 dummy_df = pd.get_dummies(
     transformed_df,
     columns=["sex", "embarked"],
+    drop_first=True,
     dtype=int
 )
 
@@ -209,7 +210,7 @@ with explore_tab:
         bins=[0, 10, 20, 30, 40, 50, 60, 70, 80],
         include_lowest=True
     ).value_counts().sort_index()
-    
+
     age_histogram.index = age_histogram.index.astype(str)
 
     st.bar_chart(age_histogram)
@@ -241,11 +242,35 @@ with preprocessing_tab:
 
     st.subheader("Missing Values Before Cleaning")
 
-    st.write(df[["age", "embarked"]].isnull().sum())
+    missing_before = (
+        df[["age", "embarked"]]
+        .isnull()
+        .sum()
+        .reset_index()
+    )
+    missing_before.columns = ["Column", "Missing Values"]
+
+    st.dataframe(
+        missing_before,
+        hide_index=True,
+        use_container_width=True
+    )
 
     st.subheader("Missing Values After Cleaning")
 
-    st.write(cleaned_df[["age", "embarked"]].isnull().sum())
+    missing_after = (
+        cleaned_df[["age", "embarked"]]
+        .isnull()
+        .sum()
+        .reset_index()
+    )
+    missing_after.columns = ["Column", "Missing Values"]
+
+    st.dataframe(
+        missing_after,
+        hide_index=True,
+        use_container_width=True
+    )
 
     st.subheader("Normalized Age and Fare")
 
